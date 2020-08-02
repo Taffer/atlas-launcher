@@ -16,12 +16,39 @@ Otherwise, grab manifest, populate display, create threads, start checking
 files. As files are not found or not validated, they're added to the DL queue.
 The DL threads pick up work from the queue as it's available.
 
+Progress bars are based on the total number of bytes reported by the manifest.
+
 ## GUI
 
 ```
 Manifest: [drop-down]                                        {+}
 
+================================================================
 =========== (big rect for the <poster_image>) ==================
+================================================================
+
+Validating: [===progress bar===]
+Downloading: [=== progress bar ===]
 
 Profile: [drop-down]                             {Verify} {Play}
+
+[status line]
+```
+
+```
+window:
+    box - vertical, spacing=5:
+        box - horizontal, spacing=5:
+            label - "Manifest:"
+            combobox? comboboxtext?
+            button - "Add"
+        HTML
+
+        box - horizonal, spacing=5:
+            label - "Validating"
+            progress bar
+        box - horizonal, spacing=5:
+            label - "Downloading:"
+            progress bar
+        status line
 ```
