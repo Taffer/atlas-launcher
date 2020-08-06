@@ -3,7 +3,9 @@
 import gi
 
 gi.require_version("Gtk", "3.0")
+gi.require_version("WebKit2", "4.0")
 from gi.repository import Gtk  # noqa: E402
+from gi.repository import WebKit2  # noqa: E402
 
 
 class ButtonWindow(Gtk.Window):
@@ -65,7 +67,14 @@ class ButtonWindow(Gtk.Window):
         dialog.destroy()
 
 
-win = ButtonWindow()
+WebKit2.WebView()  # Work around a bug in Gtk.Builder().
+builder = Gtk.Builder()
+builder.add_from_file('attempt2.glade')
+
+win = builder.get_object('mainWindow')
+webView = builder.get_object('webView')
+webView.load_uri('https://www.duckduckgo.com/')
+# win = ButtonWindow()
 win.connect("destroy", Gtk.main_quit)
 win.show_all()
 Gtk.main()

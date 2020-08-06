@@ -17,6 +17,8 @@ files. As files are not found or not validated, they're added to the DL queue.
 The DL threads pick up work from the queue as it's available.
 
 Progress bars are based on the total number of bytes reported by the manifest.
+Maybe the bytes progress bar could be for the largest file currently
+downloading/checking?
 
 ## GUI
 
@@ -25,12 +27,17 @@ Manifest: [drop-down]                                        {+}
 
 ================================================================
 =========== (big rect for the <poster_image>) ==================
+== Maybe we'll skip this for now? It PyWebkitGTK supported? ====
 ================================================================
 
-Validating: [===progress bar===]
-Downloading: [=== progress bar ===]
+Validating: [===progress bar for # of files===]
+            [===progress bar for # of bytes===]
+
+Downloading: [=== progress bar for # of files ===]
+             [=== progress bar for # of bytes ===]
 
 Profile: [drop-down]                             {Verify} {Play}
+                                                   [x] Auto-play
 
 [status line]
 ```
@@ -43,7 +50,6 @@ window:
             combobox? comboboxtext?
             button - "Add"
         HTML
-
         box - horizonal, spacing=5:
             label - "Validating"
             progress bar
