@@ -2,7 +2,7 @@
 #
 # Test interleaving reads/MD5 updates.
 #
-# Results: Smaller blocks seem optimal, maybe due to OpenSSL under the hood?
+# Results: 1MB seems to do well.
 
 import hashlib
 import time
@@ -21,7 +21,9 @@ def sum_block(filename, block_size):
     md5 = hashlib.md5()
     with open(filename, 'rb') as fp:
         data = fp.read(block_size)
-        md5.update(data)
+        while len(data) != 0:
+            md5.update(data)
+            data = fp.read(block_size)
 
     return md5.hexdigest()
 
@@ -33,17 +35,17 @@ def main():
 
     for i in range(10):
         t1 = time.time()
-        hd = sum_all('soundMusic1.pigg')
+        hd = sum_all('testdata.dat')
         dt = time.time() - t1
         all_times.append(dt)
 
         t1 = time.time()
-        hd = sum_block('soundMusic1.pigg', 1024 * 2)
+        hd = sum_block('testdata.dat', 1024 * 64)
         dt = time.time() - t1
         block_times.append(dt)
 
         t1 = time.time()
-        hd = sum_block('soundMusic1.pigg', 1024 * 1)
+        hd = sum_block('testdata.dat', 1024 * 1024)
         dt = time.time() - t1
         big_block_times.append(dt)
 
