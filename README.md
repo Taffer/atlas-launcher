@@ -2,6 +2,13 @@
 
 Portable MMO downloader/launcher using manifests.
 
+Current Status: `getmanifest.py` is works as a command-line downloader/launcher
+(essentially the same as
+[Penguin On The Rocks](https://github.com/warpshotcoh/penguinrocks)) for
+Linux! Now I just need to get a GUI going on it, then I can start working on
+the more complex bits (like threading, partial downloads, caching MD5 tags,
+and finding the best download target).
+
 Atlas uses an XML-based manifest to download the files associated with an MMO:
 
 * Downloads any files you don't already have.

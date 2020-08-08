@@ -6,6 +6,9 @@ import argparse
 import hashlib
 import os
 import requests
+import shutil
+import subprocess
+import sys
 import xml.etree.ElementTree
 
 BLOCK_SIZE = 1024 * 1024  # 1M seems to do well in limited testing.
@@ -31,7 +34,7 @@ def get_tag(filename):
 def download_file(file_path, file_size, file_md5, file_url):
     ''' Download the URL to the given path. Must match file size and MD5 tag.
     '''
-    tmp_file_path = '.'.join([file_path, 'atlas-download'])
+    tmp_file_path = '.'.join([file_path, 'atlas-download'])  # Maybe use tempfile instead?
     md5 = hashlib.md5()
     downloaded_size = 0
 
@@ -95,6 +98,8 @@ def main():
                         help="Check existing files, don't download.")
     parser.add_argument('--downloadonly', dest='download_only', action='store_true',
                         help="Download new/changed files, don't launch.")
+    parser.add_argument('--launchonly', dest='launch_only', action='store_true',
+                        help="Don't check or download, only launch. DANGEROUS!")
     parser.add_argument('--dir', dest='output_dir', default=None, required=True,
                         help='Specify the game directory.')
     parser.add_argument('manifest', default=None,
@@ -104,6 +109,10 @@ def main():
 
     # Check to see if output_dir exists.
     if not os.path.exists(args.output_dir):
+        if args.launch_only:
+            print("Launch directory {0} doesn't exist.".format(args.output_dir))
+            raise SystemExit
+
         print("Output directory {0} doesn't exist, creating it.".format(args.output_dir))
         try:
             os.mkdir(args.output_dir)
@@ -141,51 +150,83 @@ def main():
         print("    {0}: {1}".format(child.tag, child.attrib))
 
     # Check existing files.
-    print('Checking files in {0}...'.format(args.output_dir))
-    filelist = manifest_root.find('filelist')
-    if filelist is None:
-        print("Empty file list.")
-        return
-
-    print("{0} files to check:".format(len(filelist)))
     dl_list = []
-    for f in filelist:
-        file_path = os.path.join(args.output_dir, f.get('name'))
-        if os.path.exists(file_path):
-            file_size = os.path.getsize(file_path)
+    if not args.launch_only:
+        print('Checking files in {0}...'.format(args.output_dir))
+        filelist = manifest_root.find('filelist')
+        if filelist is None:
+            print("Empty file list.")
+            return
 
-            if file_size != int(f.get('size')):
-                print('    {0} ==> SIZE FAIL, will download.'.format(file_path))
+        print("{0} files to check:".format(len(filelist)))
+        for f in filelist:
+            file_path = os.path.join(args.output_dir, f.get('name'))
+            if os.path.exists(file_path):
+                file_size = os.path.getsize(file_path)
+
+                if file_size != int(f.get('size')):
+                    print('    {0} ==> SIZE FAIL, will download.'.format(file_path))
+                    dl_list.append(f)
+                    continue
+
+                md5 = get_tag(file_path)
+                if md5 != f.get('md5'):
+                    print('    {0} ==> CHECKSUM FAIL, will download.'.format(file_path))
+                    dl_list.append(f)
+                else:
+                    print('    {0} ==> OK'.format(file_path))
+            else:
+                print('    -> download {0}'.format(file_path))
                 dl_list.append(f)
+
+        if args.check_only:
+            # We done.
+            return
+
+    if not args.launch_only:
+        for f in dl_list:
+            urls = [x.text for x in f.findall('.//url')]
+
+            if len(urls) < 1:
+                print("Can't download {0}, no URLs.".format(f.get('name')))
                 continue
 
-            md5 = get_tag(file_path)
-            if md5 != f.get('md5'):
-                print('    {0} ==> CHECKSUM FAIL, will download.'.format(file_path))
-                dl_list.append(f)
-            else:
-                print('    {0} ==> OK'.format(file_path))
-        else:
-            print('    -> download {0}'.format(file_path))
-            dl_list.append(f)
+            file_path = os.path.join(args.output_dir, f.get('name'))
+            file_size = int(f.get('size'))
+            file_md5 = f.get('md5')
+            file_url = urls[0]  # How to choose? There's no region info... ping?
 
-    if args.check_only:
-        # We done.
+            download_file(file_path, file_size, file_md5, file_url)
+
+    if args.download_only:
         return
 
-    for f in dl_list:
-        urls = [x.text for x in f.findall('.//url')]
+    # If that all worked, launch!
+    if sys.platform == 'linux':
+        prefix = shutil.which('nvidia-optimus-offload-glx')  # or shutil.which("TODO: What's the AMD equivalent?")
+        # "nvidia-optimus-offload-glx wine ${exe} ${params} "
+        print('Launching for Linux via wine...')
+        os.putenv('WINEARCH', 'win64')  # I think the 32-bit client is deprecated?
 
-        if len(urls) < 1:
-            print("Can't download {0}, no URLs.".format(f.get('name')))
-            continue
+        launch_args = []
+        if prefix:
+            launch_args.append(prefix)
+        launch_args.append('wine')
+        launch = manifest_root.find('.//launch[@architecture="x64"]')
+        launch_args.append(launch.get('exec'))
+        for param in launch.get('params').split():
+            launch_args.append(param)
 
-        file_path = os.path.join(args.output_dir, f.get('name'))
-        file_size = int(f.get('size'))
-        file_md5 = f.get('md5')
-        file_url = urls[0]  # How to choose? There's no region info... ping?
+        retval = subprocess.run(launch_args, cwd=args.output_dir)
 
-        download_file(file_path, file_size, file_md5, file_url)
+    elif sys.platform == 'darwin':  # Need to double-check that.
+        # whatever the Mac Win invocation is
+        print('Launching for MacOS via wine...')
+        os.chdir(args.output_dir)
+
+    else:
+        print('Unsupported platform "{0}", will try launching without wine.'.format(sys.platform))
+        os.chdir(args.output_dir)
 
 
 if __name__ == '__main__':
