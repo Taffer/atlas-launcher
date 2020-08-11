@@ -11,6 +11,10 @@ Global config has: {
 
 For each known manifest, its URL. The last-used manifest is the default.
 
+Cache file date/time/size/MD5; if date/time/size still match, and MD5 matches,
+skip calculating the MD5 during verify, assume it's correct. Add a Force Verify
+option that's off by default?
+
 On startup, if we don't have manifest, prompt for manifest/game directory.
 Otherwise, grab manifest, populate display, create threads, start checking
 files. As files are not found or not validated, they're added to the DL queue.
@@ -19,6 +23,12 @@ The DL threads pick up work from the queue as it's available.
 Progress bars are based on the total number of bytes reported by the manifest.
 Maybe the bytes progress bar could be for the largest file currently
 downloading/checking?
+
+Advanced settings:
+
+* WINE instance, otherwise get the one from `PATH`
+* extra args
+* extra environment variables
 
 ## GUI
 
