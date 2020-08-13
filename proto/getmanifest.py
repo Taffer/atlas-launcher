@@ -203,9 +203,9 @@ def main():
 
     # If that all worked, launch!
     if sys.platform == 'linux':
-        prefix = shutil.which('nvidia-optimus-offload-glx')  # or shutil.which("TODO: What's the AMD equivalent?")
-        # "nvidia-optimus-offload-glx wine ${exe} ${params} "
         print('Launching for Linux via wine...')
+
+        prefix = shutil.which('nvidia-optimus-offload-glx')  # or shutil.which("TODO: What's the AMD equivalent?")
         os.putenv('WINEARCH', 'win64')  # I think the 32-bit client is deprecated?
 
         launch_args = []
@@ -220,14 +220,33 @@ def main():
         retval = subprocess.run(launch_args, cwd=args.output_dir)
 
     elif sys.platform == 'darwin':  # Need to double-check that.
-        # whatever the Mac Win invocation is
         print('Launching for MacOS via wine...')
-        os.chdir(args.output_dir)
+
+        os.putenv('WINEARCH', 'win64')  # I think the 32-bit client is deprecated?
+
+        launch_args = []
+        if prefix:
+            launch_args.append(prefix)
+        launch_args.append('wine')
+        launch = manifest_root.find('.//launch[@architecture="x64"]')
+        launch_args.append(launch.get('exec'))
+        for param in launch.get('params').split():
+            launch_args.append(param)
+
+        retval = subprocess.run(launch_args, cwd=args.output_dir)
 
     else:
         print('Unsupported platform "{0}", will try launching without wine.'.format(sys.platform))
-        os.chdir(args.output_dir)
 
+        launch_args = []
+        if prefix:
+            launch_args.append(prefix)
+        launch = manifest_root.find('.//launch[@architecture="x64"]')
+        launch_args.append(launch.get('exec'))
+        for param in launch.get('params').split():
+            launch_args.append(param)
+
+        retval = subprocess.run(launch_args, cwd=args.output_dir)
 
 if __name__ == '__main__':
     main()
