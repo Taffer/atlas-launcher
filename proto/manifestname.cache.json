@@ -1,0 +1,18 @@
+{
+    "manifest": "url",
+    "cache":
+    {
+        "filename":
+        {
+            "date": "file mtime",
+            "size": "file size",
+            "md5": "file MD5 tag"
+        },
+        "filename2":
+        {
+            "date": "file mtime",
+            "size": "file size",
+            "md5": "file MD5 tag"
+        }
+    }
+}

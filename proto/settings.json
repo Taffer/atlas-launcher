@@ -1,0 +1,22 @@
+{
+    "manifests":
+    [
+        {
+            "url": "manifest url",
+            "game": "game directory",
+            "last_launch": "profile 'exec' string"
+        },
+        {
+            "url": "manifest2",
+            "game": "gamedir2",
+            "last_launch": "profile 'exec' 2"
+        }
+    ],
+    "last_manifest": "manifest2",
+    "md_threads": 2,
+    "dl_threads": 4,
+    "window_position":
+    {
+        "x": 0, "y": 0, "w": 640, "h": 480
+    }
+}
