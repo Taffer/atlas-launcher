@@ -115,7 +115,7 @@ def main():
 
         print("Output directory {0} doesn't exist, creating it.".format(args.output_dir))
         try:
-            os.mkdir(args.output_dir)
+            os.makedirs(args.output_dir)
         except Exception as ex:
             print('Unable to create directory: {0}'.format(ex))
             raise SystemExit

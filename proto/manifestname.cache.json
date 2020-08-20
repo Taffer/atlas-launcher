@@ -1,5 +1,6 @@
 {
     "manifest": "url",
+    "last-modified": "manifest Last-Modified value",
     "cache":
     {
         "filename":
