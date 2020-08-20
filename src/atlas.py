@@ -22,28 +22,35 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk  # noqa: E402
 
 
-def aboutButton_clicked(button, aboutDialog):
-    ''' Main window's About button has been clicked.
-    '''
-    response = aboutDialog.run()
-    aboutDialog.hide()
+class MainWindow:
+    def __init__(self):
+        builder = Gtk.Builder()
+        builder.add_from_file('ui/atlas-launcher.glade')
+
+        self.mainWindow = builder.get_object('mainWindow')
+        self.aboutButton = builder.get_object('aboutButton')
+
+        self.aboutDialog = builder.get_object('aboutDialog')
+
+        self.mainWindow.connect('destroy', Gtk.main_quit)
+        self.aboutButton.connect('clicked', self.aboutButton_clicked)
+
+    def aboutButton_clicked(self, button):
+        ''' Main window's About button has been clicked.
+        '''
+        response = self.aboutDialog.run()
+        self.aboutDialog.hide()
+
+    def show(self):
+        self.mainWindow.show_all()
 
 
 def main():
     ''' Atlas Launcher
     '''
-    builder = Gtk.Builder()
-    builder.add_from_file('ui/atlas-launcher.glade')
+    mainWindow = MainWindow()
+    mainWindow.show()
 
-    mainWindow = builder.get_object('mainWindow')
-    aboutButton = builder.get_object('aboutButton')
-
-    aboutDialog = builder.get_object('aboutDialog')
-
-    mainWindow.connect('destroy', Gtk.main_quit)
-    aboutButton.connect('clicked', aboutButton_clicked, aboutDialog)
-
-    mainWindow.show_all()
     Gtk.main()
 
 
