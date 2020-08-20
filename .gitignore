@@ -130,3 +130,6 @@ dmypy.json
 
 # Sublime Text
 Atlas-Launcher.sublime-workspace
+
+# Glade backups
+*.glade~
