@@ -179,7 +179,6 @@
                 <property name="spacing">4</property>
                 <child>
                   <object class="GtkProgressBar" id="validatingCountProgress">
-                    <property name="height_request">16</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_start">4</property>
@@ -189,6 +188,8 @@
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
                     <property name="pulse_step">0.01</property>
+                    <property name="text" translatable="yes">0/0</property>
+                    <property name="show_text">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -199,7 +200,6 @@
                 </child>
                 <child>
                   <object class="GtkProgressBar" id="validatingByteProgress">
-                    <property name="height_request">16</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_start">4</property>
@@ -208,6 +208,7 @@
                     <property name="margin_bottom">4</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <property name="show_text">True</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -235,7 +236,6 @@
                 <property name="spacing">4</property>
                 <child>
                   <object class="GtkProgressBar" id="downloadCountProgress">
-                    <property name="height_request">16</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_start">4</property>
@@ -244,6 +244,8 @@
                     <property name="margin_bottom">4</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <property name="text" translatable="yes">0/0</property>
+                    <property name="show_text">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -254,7 +256,6 @@
                 </child>
                 <child>
                   <object class="GtkProgressBar" id="downloadByteProgress">
-                    <property name="height_request">16</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_start">4</property>
@@ -263,6 +264,7 @@
                     <property name="margin_bottom">4</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <property name="show_text">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -274,42 +276,6 @@
               </object>
               <packing>
                 <property name="left_attach">1</property>
-                <property name="top_attach">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="validationCountLabel">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="valign">start</property>
-                <property name="margin_start">4</property>
-                <property name="margin_end">4</property>
-                <property name="margin_top">4</property>
-                <property name="margin_bottom">4</property>
-                <property name="vexpand">True</property>
-                <property name="label" translatable="yes">0</property>
-                <property name="justify">right</property>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
-                <property name="top_attach">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="downloadCountLabel">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="valign">start</property>
-                <property name="margin_start">4</property>
-                <property name="margin_end">4</property>
-                <property name="margin_top">4</property>
-                <property name="margin_bottom">4</property>
-                <property name="vexpand">True</property>
-                <property name="label" translatable="yes">0</property>
-                <property name="justify">right</property>
-              </object>
-              <packing>
-                <property name="left_attach">2</property>
                 <property name="top_attach">1</property>
               </packing>
             </child>

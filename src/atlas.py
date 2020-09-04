@@ -22,7 +22,7 @@ from manifest import Manifest
 from settings import AtlasSettings
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk  # noqa: E402
+from gi.repository import GLib, Gtk  # noqa: E402
 
 
 class MainWindow:
@@ -33,7 +33,6 @@ class MainWindow:
         self.mainWindow = builder.get_object('mainWindow')
         self.aboutButton = builder.get_object('aboutButton')
         self.manifestLabel = builder.get_object('manifestLabel')
-        self.validationCountLabel = builder.get_object('validationCountLabel')
 
         self.aboutDialog = builder.get_object('aboutDialog')
 
@@ -42,6 +41,7 @@ class MainWindow:
 
         self.manifest_url = manifest_url
 
+        # TODO: Trigger this via idle event. GLib.idle_add()
         # Fire up a thread to load the manifest so we don't block the UI.
         self.manifest_thread_done = False
         self.manifest_thread = threading.Thread(name='atlas-download-manifest', args=(self,), target=MainWindow.manifest_loader)
@@ -51,13 +51,11 @@ class MainWindow:
     def manifest_loader(self):
         ''' Load the manifest data in a separate thread.
         '''
+        # TODO: UI changes should happen in the main thread. Maybe that's
+        # what happens when you change properties like the label text?
         self.manifestLabel.set_text('Downloading {0}'.format(self.manifest_url))
-
         self.manifest = Manifest(self.manifest_url)
-
         self.manifestLabel.set_text(self.manifest_url)
-        self.validationCountLabel.set_text(str(len(self.manifest.file_list)))
-
         self.manifest_thread_done = True
 
     def aboutButton_clicked(self, button):
@@ -80,9 +78,9 @@ def main():
     ''' Atlas Launcher
     '''
     parser = argparse.ArgumentParser(description='Download a manifest, check files.')
-    parser.add_argument('--dir', dest='output_dir', default=None, required=True,
+    parser.add_argument('--dir', dest='output_dir', default='~/City of Heroes - Homecoming',
                         help='Specify the game directory.')
-    parser.add_argument('manifest', default=None,
+    parser.add_argument('--manifest', dest='manifest', default='http://patch.savecoh.com/manifest.xml',
                         help='Manifest URL.')
     args = parser.parse_args()
 

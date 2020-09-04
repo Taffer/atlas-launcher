@@ -68,3 +68,29 @@ window:
             progress bar
         status line
 ```
+
+## State Machine
+
+Start
+-> Display UI
+   -> launch manifest loading thread
+      -> loading
+      -> error -> send Error state to UI
+      -> success -> send Checking state to UI
+      -> send Join Me to UI, exit thread
+   -> no files? -> send DL state to UI w/all files, skip checking thread
+   -> launch checking thread(s)
+      -> file wrong? -> send DL state to UI w/that file
+      -> file good? -> send Checked state to UI w/that file
+      -> send Join Me to UI, exit thread
+   -> launch DL thread(s)
+      -> error -> send Error DL state to UI
+      -> success -> send Done state to UI w/that file
+      -> send Join Me to UI, exit thread
+
+In a thread:
+- get mutex
+- if list has items, take thing from list, do thing
+- release mutex
+- if exit_thread flag set, send Join Me, exit
+- else loop

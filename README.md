@@ -24,6 +24,18 @@ The goals of Atlas are:
 * Smart about not reading/hashing files that haven't changed since the last
   check.
 
+## Open Questions
+
+If you've got answers to these, or can point me in the right direction (yeah,
+I know how to use [DuckDuckGo](https://duckduckgo.com/)) let me know!
+
+* I can't figure out how to get GTK's WebKit2 on MacOS, let alone get its
+  Python bindings there. Until then, Atlas will be less flashy than Tequila or
+  Island Rum.
+* Still not entirely sure how to package Atlas in a sane manner.
+
+## Why "Atlas"
+
 Atlas is named after Atlas Park, one of the starting zones in my favourite
 MMO of all time, _City of Heroes_.
 
