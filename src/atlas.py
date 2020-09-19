@@ -17,16 +17,20 @@ with modern conveniences.
 import argparse
 import gi
 import threading
+import os
+
 from cache import AtlasCache
-from manifest import Manifest
 from settings import AtlasSettings
+from workers import ManifestLoader
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import GLib, Gtk  # noqa: E402
 
+ATLAS_CONFIG = '~/.config/atlas-launcher'
+
 
 class MainWindow:
-    def __init__(self, manifest_url):
+    def __init__(self, manifest_url, settings):
         builder = Gtk.Builder()
         builder.add_from_file('ui/atlas-launcher.glade')
 
@@ -40,6 +44,7 @@ class MainWindow:
         self.aboutButton.connect('clicked', self.aboutButton_clicked)
 
         self.manifest_url = manifest_url
+        self.settings = settings
 
         # TODO: Trigger this via idle event. GLib.idle_add()
         # Fire up a thread to load the manifest so we don't block the UI.
@@ -68,6 +73,19 @@ class MainWindow:
         ''' Window is being destroyed, clean up and get out.
         '''
         self.manifest_thread.join()  # This should have been finished ages ago.
+
+        # Preserve current window location.
+        # TODO: How do I set this when the window is shown?
+        pos = widget.get_position()
+
+        if pos.root_x == 0 and pos.root_y == 0:
+            # See the gtk_window_get_position() docs for the reason behind
+            # this horror.
+            widget.set_position(Gtk.WindowPosition.CENTER)
+            pos = widget.get_position()
+
+        self.settings.set_position(pos.root_x, pos.root_y)
+
         Gtk.main_quit()
 
     def show(self):
@@ -78,13 +96,16 @@ def main():
     ''' Atlas Launcher
     '''
     parser = argparse.ArgumentParser(description='Download a manifest, check files.')
-    parser.add_argument('--dir', dest='output_dir', default='~/City of Heroes - Homecoming',
+    parser.add_argument('--dir', dest='output_dir', default=AtlasSettings.HOMECOMING_GAMEDIR,
                         help='Specify the game directory.')
-    parser.add_argument('--manifest', dest='manifest', default='http://patch.savecoh.com/manifest.xml',
+    parser.add_argument('--manifest', dest='manifest', default=AtlasSettings.HOMECOMING_MANIFEST,
                         help='Manifest URL.')
     args = parser.parse_args()
 
-    mainWindow = MainWindow(args.manifest)
+    config_path = os.path.expanduser(ATLAS_CONFIG)
+    config = AtlasSettings(config_path)
+
+    mainWindow = MainWindow(args.manifest, config)
     mainWindow.show()
 
     Gtk.main()
