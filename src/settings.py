@@ -40,10 +40,7 @@ class AtlasSettings:
         'manifests': [],
         'last_manifest': None,
         'md_threads': 1,  # MD5 checker threads
-        'dl_threads': 1,  # Download threads
-        'window_position': {
-            'x': 100, 'y': 100
-        }
+        'dl_threads': 1  # Download threads
     }
 
     def __init__(self, path, name='atlas.config'):
@@ -96,14 +93,3 @@ class AtlasSettings:
         If the manifest URL has never been loaded, the cache will be empty.
         '''
         raise NotImplementedError('no cache for you')
-
-    def set_position(self, x, y):
-        ''' Record the window's position.
-        '''
-        new_pos = {
-            'x': x,
-            'y': y
-        }
-        self.settings['window_position'] = new_pos
-
-        self.save()

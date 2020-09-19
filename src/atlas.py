@@ -73,19 +73,6 @@ class MainWindow:
         ''' Window is being destroyed, clean up and get out.
         '''
         self.manifest_thread.join()  # This should have been finished ages ago.
-
-        # Preserve current window location.
-        # TODO: How do I set this when the window is shown?
-        pos = widget.get_position()
-
-        if pos.root_x == 0 and pos.root_y == 0:
-            # See the gtk_window_get_position() docs for the reason behind
-            # this horror.
-            widget.set_position(Gtk.WindowPosition.CENTER)
-            pos = widget.get_position()
-
-        self.settings.set_position(pos.root_x, pos.root_y)
-
         Gtk.main_quit()
 
     def show(self):
