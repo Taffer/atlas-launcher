@@ -24,6 +24,22 @@ The goals of Atlas are:
 * Smart about not reading/hashing files that haven't changed since the last
   check.
 
+Current state (2020-09-21):
+
+* `proto/getmanifest.py` grabs the manifest, checks/downloads files, and
+  launches the game; it uses caching to speed up subsequent launches... it's
+  essentially "good enough" to be used thusly:
+
+```
+/path/to/getmanifest.py --dir /path/to/city-of-heroes http://url.for/manifest.xml
+```
+
+* Tested only with Linux and Homecoming, since that's the OS and server I play
+  on.
+
+* Working on "real" version's UI; it's slow going because I've never done GTK
+  before.
+
 ## Open Questions
 
 If you've got answers to these, or can point me in the right direction (yeah,
@@ -44,6 +60,13 @@ MMO of all time, _City of Heroes_.
 (Image courtesy of
 [Paragon Wiki](https://archive.paragonwiki.com/wiki/Main_Page). It was
 actually used in-game while loading the Atlas Park zone.)
+
+## Requirements
+
+The `getmanifest.py` prototype requires Python 3, but nothing extra.
+
+The real launcher will also require GTK 3 and its introspection-based Python
+module.
 
 ## Manifest Format
 
