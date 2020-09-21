@@ -4,6 +4,7 @@
 
 import argparse
 import hashlib
+import json
 import os
 import requests
 import shutil
@@ -149,6 +150,32 @@ def main():
     for child in manifest_root:
         print("    {0}: {1}".format(child.tag, child.attrib))
 
+    # Load cache if there is one. Cache contents are:
+    #
+    # url: string   The manifest URL that this cache is for; if it doesn't
+    #               match, the cache is invalidated.
+    #
+    # pathname: (size, mtime, md5)  For each <file name="">, the size,
+    #                               modification time, and MD5 digest. If the
+    #                               MD5 from the manifest matches this one, and
+    #                               the file's current size and mtime match
+    #                               this one, we don't check the file.
+    cache = {}
+    cache_file = os.path.join(args.output_dir, '.manifest.cache')
+    cache_dirty = False
+    if os.path.exists(cache_file):
+        with open(cache_file, 'r') as fp:
+            try:
+                cache = json.load(fp)
+            except json.decoder.JSONDecodeError as ex:
+                print('Unable to load manifest cache.')
+                # This is probably unnecessary, but I don't know.
+                cache = {}
+
+    if cache.get('url') is None or cache.get('url') != args.manifest:
+        # Cache is for a different URL (or empty); clear it.
+        cache = {'url': args.manifest}
+
     # Check existing files.
     dl_list = []
     if not args.launch_only:
@@ -163,11 +190,19 @@ def main():
             file_path = os.path.join(args.output_dir, f.get('name'))
             if os.path.exists(file_path):
                 file_size = os.path.getsize(file_path)
+                file_mtime = os.path.getmtime(file_path)
 
                 if file_size != int(f.get('size')):
                     print('    {0} ==> SIZE FAIL, will download.'.format(file_path))
                     dl_list.append(f)
                     continue
+                elif f.get('name') in cache:
+                    # Check mtime and md5 against the cache.
+                    (size, mtime, digest) = cache[f.get('name')]
+
+                    if file_size == size and file_mtime == mtime and f.get('md5') == digest:
+                        print('    {0} ==> OK (cached)'.format(file_path))
+                        continue
 
                 md5 = get_tag(file_path)
                 if md5 != f.get('md5'):
@@ -175,9 +210,20 @@ def main():
                     dl_list.append(f)
                 else:
                     print('    {0} ==> OK'.format(file_path))
+
+                    # Add to the cache.
+                    cache[f.get('name')] = (file_size, file_mtime, md5)
+                    cache_dirty = True
             else:
                 print('    -> download {0}'.format(file_path))
                 dl_list.append(f)
+
+        # Save the cache if it's dirty.
+        if cache_dirty:
+            if os.path.exists(cache_file):
+                os.unlink(cache_file)
+            with open(cache_file, 'w') as fp:
+                json.dump(cache, fp)
 
         if args.check_only:
             # We done.
@@ -197,6 +243,18 @@ def main():
             file_url = urls[0]  # How to choose? There's no region info... ping?
 
             download_file(file_path, file_size, file_md5, file_url)
+
+            # Add to the cache.
+            file_mtime = os.path.getmtime(file_path)
+            cache[f.get('name')] = (file_size, file_mtime, file_md5)
+            cache_dirty = True
+
+        # Save the cache if it's dirty.
+        if cache_dirty:
+            if os.path.exists(cache_file):
+                os.unlink(cache_file)
+            with open(cache_file, 'w') as fp:
+                json.dump(cache, fp)
 
     if args.download_only:
         return
