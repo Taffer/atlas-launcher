@@ -44,7 +44,7 @@ def download_file(file_path, file_size, file_md5, file_url):
     if not os.path.exists(dirs):
         os.makedirs(dirs)
 
-    print('Downloading {0}: {1}'.format(file_path, downloaded_size), end='\r')
+    print('Downloading {0}: {1}'.format(file_path, downloaded_size))
 
     with requests.get(file_url, stream=True, headers=HTTP_HEADERS, timeout=RESPONSE_TIMEOUT) as request:
         if request.status_code != requests.codes.ok:
@@ -57,7 +57,6 @@ def download_file(file_path, file_size, file_md5, file_url):
                 fp.write(chunk)
                 md5.update(chunk)
                 downloaded_size = downloaded_size + len(chunk)
-                print('Downloading {0}: {1}'.format(file_path, downloaded_size), end='\r')
 
     if downloaded_size != file_size:
         print('{0}: Downloaded {1} bytes, expected {2}'.format(file_path, downloaded_size, file_size))
