@@ -9,6 +9,14 @@ Linux! Now I just need to get a GUI going on it, then I can start working on
 the more complex bits (like threading, partial downloads, caching MD5 tags,
 and finding the best download target).
 
+---
+**NOTE:** The Homecoming folks recently put
+[a new launcher](https://forums.homecomingservers.com/topic/23091-homecoming-launcher-public-beta/)
+into beta. It's doing all the things Atlas was going to do, except for the
+"runs native on Linux and MacOS" part... works well under WINE though. So I
+might be abandoning this project.
+---
+
 Atlas uses an XML-based manifest to download the files associated with an MMO:
 
 * Downloads any files you don't already have.
