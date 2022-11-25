@@ -1,3 +1,11 @@
+# Moved
+
+This repo is has been replaced by: https://codeberg.org/Taffer/atlas-launcher
+
+![Logo of the GiveUpGitHub campaign](https://sfconservancy.org/img/GiveUpGitHub.png)
+
+Everything in this repo should be considered out of date.
+
 # Atlas Launcher
 
 Portable MMO downloader/launcher using manifests.
